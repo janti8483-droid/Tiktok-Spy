@@ -1,0 +1,138 @@
+import urllib.request
+import json
+import urllib.parse
+import os
+
+BLUE = "\033[94m"
+YELLOW = "\033[93m"
+WHITE = "\033[97m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+RESET = "\033[0m"
+
+def clear_screen():
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+def print_banner():
+    banner = f"""{WHITE}
+████████╗██╗██╗  ██╗████████╗ ██████╗ ██╗  ██╗
+╚══██╔══╝██║██║ ██╔╝╚══██╔══╝██╔═══██╗██║ ██╔╝
+   ██║   ██║█████╔╝    ██║   ██║   ██║█████╔╝ 
+   ██║   ██║██╔═██╗    ██║   ██║   ██║██╔═██╗ 
+   ██║   ██║██║  ██╗   ██║   ╚██████╔╝██║  ██╗
+   ╚═╝   ╚═╝╚═╝  ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝{RESET}"""
+    print(banner)
+    print(f"{WHITE}═" * 54 + f"{RESET}")
+    print(f" 🕵️‍♂️  {WHITE}TIKTOK PROFILE SPY & INTELLIGENCE SYSTEM | v1.2{RESET}")
+    print(f" 👨‍💻  Developer: {BLUE}httpjanti{RESET} 🌟")
+    print(f" {WHITE}═" * 54 + f"{RESET}")
+
+def fetch_tiktok_data(username, lang):
+    username_cleaned = username.strip().replace("@", "")
+    live_url = f"https://www.tikwm.com/api/user/info?unique_id={urllib.parse.quote(username_cleaned)}"
+
+    req = urllib.request.Request(
+        live_url, 
+        headers={
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+            'Accept': 'application/json'
+        }
+    )
+    
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            res_data = json.loads(response.read().decode('utf-8'))
+            
+            if "data" not in res_data or res_data.get("code") != 0:
+                raise Exception("User not found")
+                
+            data = res_data["data"]
+            user = data.get("user", {})
+            stats = data.get("stats", {})
+            
+            user_id = user.get("id", "N/A")
+            nickname = user.get("nickname", "N/A")
+            bio = user.get("signature", "No Bio / Biyografi Yok")
+            is_verified = user.get("verified", False)
+            is_private = user.get("privateAccount", False)
+            avatar = user.get("avatar", "No Image")
+            
+            followers = stats.get("followerCount", 0)
+            following = stats.get("followingCount", 0)
+            hearts = stats.get("heartCount", 0)
+            videos = stats.get("videoCount", 0)
+
+            f_followers = f"{followers:,}"
+            f_following = f"{following:,}"
+            f_hearts = f"{hearts:,}"
+            f_videos = f"{videos:,}"
+
+            badge = f"{BLUE}[VERIFIED / ONAYLI]{RESET}" if is_verified else f"{WHITE}[Standard]{RESET}"
+            badge_tr = f"{BLUE}[MAVİ TİK / ONAYLI]{RESET}" if is_verified else f"{WHITE}[Standart Hesap]{RESET}"
+            privacy = f"{RED}🔒 PRIVATE ACCOUNT (GİZLİ){RESET}" if is_private else f"{GREEN}🔓 PUBLIC ACCOUNT (AÇIK){RESET}"
+
+            if lang == "2":
+                print(f"\n{WHITE}========== TARGET PROFILE DETAILS =========={RESET}")
+                print(f"👤 Username     : @{username_cleaned}")
+                print(f"📛 Display Name : {nickname} {badge}")
+                print(f"🆔 Unique ID     : {user_id}")
+                print(f"👁️ Account Type : {privacy}")
+                print(f"📝 Biography    : {bio}")
+                print(f"{WHITE}--------------------------------------------{RESET}")
+                print(f"📈 Followers    : {f_followers}")
+                print(f"📉 Following    : {f_following}")
+                print(f"❤️ Total Likes  : {f_hearts}")
+                print(f"🎬 Video Count  : {f_videos}")
+                print(f"🖼️ Avatar Link  : {avatar}")
+                print(f"{WHITE}============================================{RESET}")
+                print(f"\n✅ {GREEN}SUCCESS:{RESET} Intelligence gathering completed. Secured by httpjanti.")
+            else:
+                print(f"\n{WHITE}========== HEDEF PROFİL DETAYLARI =========={RESET}")
+                print(f"👤 Kullanıcı Adı: @{username_cleaned}")
+                print(f"📛 Görünen İsim : {nickname} {badge_tr}")
+                print(f"🆔 Benzersiz ID : {user_id}")
+                print(f"👁️ Hesap Durumu : {privacy}")
+                print(f"📝 Biyografi    : {bio}")
+                print(f"{WHITE}--------------------------------------------{RESET}")
+                print(f"📈 Takipçi      : {f_followers}")
+                print(f"📉 Takip Edilen : {f_following}")
+                print(f"❤️ Toplam Beğeni: {f_hearts}")
+                print(f"🎬 Video Sayısı : {f_videos}")
+                print(f"🖼️ Profil Resmi : {avatar}")
+                print(f"{WHITE}============================================{RESET}")
+                print(f"\n✅ {GREEN}BAŞARILI:{RESET} İstihbarat toplama tamamlandı. httpjanti güvencesiyle.")
+
+    except Exception:
+        if lang == "2":
+            print(f"\n{RED}[-] Error: TikTok user not found or 2026 API timeout!{RESET}")
+        else:
+            print(f"\n{RED}[-] Hata: TikTok kullanıcısı bulunamadı veya 2026 API hattı yanıt vermedi!{RESET}")
+
+def main():
+    clear_screen()
+    print_banner()
+    print(" [1] Türkçe (TR)")
+    print(" [2] English (EN)")
+    print(f"{WHITE}═" * 54 + f"{RESET}")
+    lang = input(" 🌐 Select Language / Dil Seçiniz (1/2): ").strip()
+    
+    if lang == "2":
+        prompt = "\n[+] Enter Target TikTok Username (e.g. khaby.lame): "
+    else:
+        prompt = "\n[+] Hedef TikTok Kullanıcı Adını Girin (Örn: cznburak): "
+        
+    username = input(prompt).strip()
+    
+    if username:
+        clear_screen()
+        print_banner()
+        if lang == "2":
+            print(f"\n{YELLOW}[*] Scanning target: @{username}... Please wait.{RESET}")
+        else:
+            print(f"\n{YELLOW}[*] Hedef taranıyor: @{username}... Lütfen bekleyin.{RESET}")
+        fetch_tiktok_data(username, lang)
+    else:
+        print("[-] Empty username!")
+
+if __name__ == "__main__":
+    main()
